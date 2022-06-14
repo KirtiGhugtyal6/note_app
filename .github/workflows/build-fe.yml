@@ -2,10 +2,10 @@ name: Build Frontend
 on:
   pull_request:
     branches:
-      - main
+      - develope
   push:
     branches:
-      - main
+      - develope
     
 jobs:
   buildapp:
