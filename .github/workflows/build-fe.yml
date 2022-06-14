@@ -6,8 +6,8 @@ on:
   push:
     branches:
       - develope
-    paths:
-      - 'src/**/*'
+#     paths:
+#       - 'src/**/*'
     
     
 jobs:
@@ -15,32 +15,60 @@ jobs:
     name: build FE
     runs-on: ubuntu-18.04
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
-      with:
-        node-version: '14.x'
+      - uses: actions/checkout@v2
 
-    - name: Cache Packages
-      uses: actions/cache@v2
-      with:
-        path: |
-          ui/node_modules
-        key: ${{ runner.os }}-npm-${{ hashFiles('**/package.json') }}
-    - name: 'Set up Cloud SDK'
-      uses: 'google-github-actions/setup-gcloud@v0'
+      - name: Change text file
+        run: |
+          echo "Modified" > new.txt
 
-    - name: Package Frontend
-      run: |
-        docker build -t test-image .
-    - uses: anchore/sbom-action@v0
-      with: 
-        image: test-image:latest
-        artifact-name: report.spdx-json
-        output-file: ./report.spdx-json
+      - name: Change file in directory
+        run: |
+          echo "Changed" > test_directory/new.txt
 
-    - name: cat
-      run: |
-        pwd
-        ls
-        cat report.spdx-json
+      - name: Verify Changed files
+        uses: tj-actions/verify-changed-files@v9.2
+        id: verify-changed-files
+        with:
+          files: |
+             *.txt
+             test_directory
+             action.yml
+             **/*.py
+             **/*.jpeg
+             *.sql
+
+      - name: Run step only when files change.
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        run: |
+          echo "Changed files: ${{ steps.verify-changed-files.outputs.changed_files }}"
+        # Outputs: "Changed files: new.txt test_directory/new.txt"
+
+#       - name: Checkout
+#         uses: actions/checkout@v2
+#       - uses: actions/setup-node@v1
+#         with:
+#         node-version: '14.x'
+
+#       - name: Cache Packages
+#         uses: actions/cache@v2
+#         with:
+#         path: |
+#           ui/node_modules
+#         key: ${{ runner.os }}-npm-${{ hashFiles('**/package.json') }}
+#       - name: 'Set up Cloud SDK'
+#         uses: 'google-github-actions/setup-gcloud@v0'
+
+#       - name: Package Frontend
+#         run: |
+#           docker build -t test-image .
+#       - uses: anchore/sbom-action@v0
+#         with: 
+#         image: test-image:latest
+#         artifact-name: report.spdx-json
+#         output-file: ./report.spdx-json
+
+      - name: cat
+        run: |
+         pwd
+         ls
+         cat report.spdx-json
