@@ -1,6 +1,6 @@
 name: Create and upload a SBOM to release assets
 on:
-  workflow_dispatch:
+  repository_dispatch:
     types: [generate-sbom]
 defaults:
   run:
