@@ -8,16 +8,14 @@ defaults:
 jobs:
 create-sbom:
    needs: version-check
-    runs-on:
-    steps:
-    #Installation    
+    runs-on:ubuntu-18.04
+    steps:   
       - name: Install SYFT tool on Windows
         if: ${{ runner.os == 'Windows' }}
         run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b D:/syft
       - name: Install SYFT tool on Ubuntu or macOS
         if: ${{ runner.os != 'Windows' }}
-        run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin 
-    #Run        
+        run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin      
       - name: Run SYFT on Windows
         if: ${{ runner.os == 'Windows' }}
         run: D:/syft/syft dir:C:/ -vv -o spdx-json=sbom.json
@@ -27,7 +25,6 @@ create-sbom:
       - name: Run SYFT on macOS
         if: ${{ runner.os == 'macOS' }}
         run: syft dir:/ -vv -o spdx-json=sbom.json --exclude ./Users --exclude ./System/Volumes --exclude ./private        
-    #Preparing artifact
       - name: Compress SBOM file
         run: Compress-Archive sbom.json sbom.json.zip
       - uses: actions/upload-artifact@v3
